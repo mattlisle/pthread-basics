@@ -4,8 +4,8 @@ CFLAGS?=-g -Wall -Wno-unused-value
 
 all: caltrain reaction
 
-caltrain: caltrain-runner.c caltrain.c pintos_thread.h
-	$(CC) $(CFLAGS) -o caltrain caltrain-runner.c -lpthread 
+caltrain: caltrain.c caltrain-runner.c pintos_thread.h caltrain.h
+	$(CC) $(CFLAGS) -o caltrain caltrain.c caltrain-runner.c -lpthread 
 
 reaction: reaction-runner.c reaction.c pintos_thread.h
 	$(CC) $(CFLAGS) -o reaction reaction-runner.c -lpthread 
