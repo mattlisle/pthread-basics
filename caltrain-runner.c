@@ -21,6 +21,11 @@
 // has returned) and are awaiting a station_on_board() invocation.
 volatile int threads_completed = 0;
 
+/**
+ * Contains the life cycle of a passenger thread
+ * @param arg station that the passenger will board from
+ * 						void* so it can be cast to a `struct station`
+ */
 void*
 passenger_thread(void *arg)
 {
@@ -79,19 +84,21 @@ main()
 	struct station station;
 	station_init(&station);
 
+	// Seeded random generator, `getpid` gets process id, `time` is current time
 	srandom(getpid() ^ time(NULL));
 
 	signal(SIGALRM, alarm_handler);
-
+	
 	// Make sure station_load_train() returns immediately if no waiting passengers.
 	_alarm(1, "station_load_train() did not return immediately when no waiting passengers");
+	printf("######### Beginning no waiting passengers tests #########\n");
 	station_load_train(&station, 0);
 	station_load_train(&station, 10);
 	_alarm(0, NULL);
 
 	// Create a bunch of 'passengers', each in their own thread.
 	int i;
-	const int total_passengers = 1000;
+	const int total_passengers = 100;
 	int passengers_left = total_passengers;
 	for (i = 0; i < total_passengers; i++) {
 		pthread_t tid;
@@ -106,6 +113,7 @@ main()
 
 	// Make sure station_load_train() returns immediately if no free seats.
 	_alarm(2, "station_load_train() did not return immediately when no free seats");
+	printf("######### Beginning no free seats test #########\n");
 	station_load_train(&station, 0);
 	_alarm(0, NULL);
 
@@ -113,6 +121,7 @@ main()
 	int total_passengers_boarded = 0;
 	const int max_free_seats_per_train = 50;
 	int pass = 0;
+	printf("######### Beginning 1000-passenger test #########\n");
 	while (passengers_left > 0) {
 		_alarm(2, "Some more complicated issue appears to have caused passengers "
 			"not to board when given the opportunity");
